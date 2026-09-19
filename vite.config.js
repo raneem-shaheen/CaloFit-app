@@ -14,6 +14,14 @@ export default defineConfig({
           'ngrok-skip-browser-warning': 'true',
         },
       },
+      '/uploads': {
+        target: 'https://verbose-cornhusk-aptitude.ngrok-free.dev',
+        changeOrigin: true,
+        secure: false,
+        headers: {
+          'ngrok-skip-browser-warning': 'true',
+        },
+      },
     },
   }
 })

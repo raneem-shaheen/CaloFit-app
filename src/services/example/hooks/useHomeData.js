@@ -14,6 +14,7 @@ export function useHomeData() {
         
 
         const rawData = await fetchHomeData();
+        console.log("FeedBack From Backend:", rawData?.feedBack)
         
 
         

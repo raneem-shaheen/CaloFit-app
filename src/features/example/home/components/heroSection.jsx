@@ -1,12 +1,15 @@
 import heroDishImg from '../../../../assets/images/hero-dish.png'
 import { useHomeData } from '../../../../services/hooks/useHomeData'
 
-const AVATAR_SERVER_URL = 'https://verbose-cornhusk-aptitude.ngrok-free.dev'
 const FALLBACK_AVATAR_URL = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
 
 function HeroSection() {
   const { heroData, loading } = useHomeData()
-  console.log('HERO_DEBUG:', { heroData, loading })
+  const rating = Math.max(
+    0,
+    Math.min(5, Math.round(Number(heroData?.rating ?? 5) || 5)),
+  )
+
   return (
     <section className="w-full bg-[radial-gradient(circle_at_8%_35%,#dcfce7_0%,#faf9f6_34%,#faf9f6_70%,#fef3c7_100%)] py-12 sm:py-16 lg:min-h-[calc(100vh-5rem)] lg:py-20">
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-6 lg:grid-cols-2">
@@ -46,32 +49,37 @@ function HeroSection() {
                       />
                     ))
                   : heroData?.avatars?.map((item) => (
-                      (() => {
-                        const avatarUrl = /^https?:\/\//i.test(item.avatar)
-                          ? item.avatar
-                          : item.avatar?.startsWith('/')
-                            ? `${AVATAR_SERVER_URL}${item.avatar}`
-                            : item.avatar
-
-                        return (
-                          <img
-                            key={item.id}
-                            src={avatarUrl || FALLBACK_AVATAR_URL}
-                            alt={item.name}
-                            className="inline-block h-10 w-10 rounded-full object-cover ring-2 ring-warm-50"
-                            onError={(event) => {
-                              event.currentTarget.onerror = null
-                              event.currentTarget.src = FALLBACK_AVATAR_URL
-                            }}
-                          />
-                        )
-                      })()
+                      <img
+                        key={item.id}
+                        src={item.avatar || FALLBACK_AVATAR_URL}
+                        alt={item.name}
+                        className="inline-block h-10 w-10 rounded-full object-cover ring-2 ring-warm-50"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null
+                          event.currentTarget.src = FALLBACK_AVATAR_URL
+                        }}
+                      />
                     ))}
               </div>
               <div className="flex min-w-[12rem] flex-col">
-                <div className="flex text-xs text-amber-400">{'★'.repeat(5)}</div>
+                <div
+                  className="flex gap-0.5 text-xs"
+                  aria-label={`${rating} out of 5 stars`}
+                >
+                  {Array.from({ length: 5 }, (_, starIndex) => (
+                    <span
+                      key={starIndex}
+                      className={
+                        starIndex < rating ? 'text-amber-500' : 'text-gray-300'
+                      }
+                      aria-hidden="true"
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
                 <p className="text-xs font-bold text-warm-900 sm:text-sm">
-                  {heroData?.rating || 5}/5{' '}
+                  {rating}/5{' '}
                   <span className="font-normal text-warm-700">
                     from {heroData?.totalCount || 0} foodies
                   </span>
@@ -85,7 +93,7 @@ function HeroSection() {
             </div>
           </div>
         </div>
-        <div className="flex justify-center rounded-none bg-stone-200/80 p-4 sm:p-6 lg:p-8">
+        <div className="flex justify-center rounded-none p-4 sm:p-6 lg:p-8">
           <img
             src={heroDishImg}
             alt="Healthy Salmon Bowl"
