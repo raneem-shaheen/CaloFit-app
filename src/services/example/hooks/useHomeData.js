@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { fetchHomeData } from '../home.service';
-import { formatHeroFeedback, formatTestimonials } from '../dtos/home.dto';
+import { formatHeroFeedback, 
+  formatTestimonials, 
+  formatPureFeatures,
+  formatSocialLink,
+} from '../dtos/home.dto';
 
 export function useHomeData() {
   const [heroData, setHeroData] = useState(null);
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [pureFeatures,setPureFeatures]=useState([])
+  const[socialLink,setSocialLink]=useState([])
   useEffect(() => {
     async function loadData() {
       try {
@@ -26,6 +31,12 @@ export function useHomeData() {
         
         setTestimonials(formattedTestimonials);
 
+        const pureData=rawData?.data?.pure||rawData?.pure||[];
+        setPureFeatures(formatPureFeatures(pureData));
+
+        const contactData = rawData?.data || rawData || []
+        setSocialLink(formatSocialLink(contactData));
+
       } catch (err) {
         console.error("error in useHomeData", err);
       } finally {
@@ -36,5 +47,5 @@ export function useHomeData() {
     loadData();
   }, []);
 
-  return { heroData, testimonials, loading };
+  return { heroData, testimonials, pureFeatures,socialLink,loading };
 }
