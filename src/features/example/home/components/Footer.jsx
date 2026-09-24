@@ -9,7 +9,7 @@ const SOCIAL_ICONS ={
     )
 }
 export default function Footer (){
-  const { socialLinks } = useHomeData()
+  const { socialLinks, loading } = useHomeData()
     return(
         <>
         <footer className="bg-[#1C1B18] text-white pt-16 pb-12 px-6 lg:px-16">
@@ -87,20 +87,24 @@ export default function Footer (){
             Follow Us
           </h4>
           <div className="flex items-center gap-4 mt-1">
-            {socialLinks.length > 0 ? (
+            {loading ? (
+              <div className="h-5 w-24 animate-pulse rounded bg-white/10" aria-label="Loading social links" />
+            ) : (
               socialLinks.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-white transition-colors"
-                  title="X (Twitter)"
-                >
-                  {SOCIAL_ICONS[item.source?.trim().toLowerCase()] || SOCIAL_ICONS.x}
-                </a>
+                SOCIAL_ICONS[item.source?.trim().toLowerCase()] && item.link ? (
+                  <a
+                    key={item.id}
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-white transition-colors"
+                    title={item.source}
+                  >
+                    {SOCIAL_ICONS[item.source.trim().toLowerCase()]}
+                  </a>
+                ) : null
               ))
-            ) : null}
+            )}
           </div>
         </div>
 

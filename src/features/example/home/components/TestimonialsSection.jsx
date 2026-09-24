@@ -1,15 +1,31 @@
 import { useHomeData } from '../../../../services/hooks/useHomeData'
 
-const FALLBACK_AVATAR_URL = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-
 export default function TestimonialsSection() {
   const { testimonials, loading } = useHomeData()
 
   if (loading) {
     return (
-      <div className="py-16 text-center text-gray-400">
-        Loading reviews...
-      </div>
+      <section className="bg-[#FAF8F5] px-6 py-20" aria-label="Loading testimonials">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 text-center">
+            <span className="text-xs font-bold tracking-widest text-[#2D6A4F] uppercase">COMMUNITY LOVE</span>
+            <h2 className="mt-3 text-3xl font-extrabold text-gray-900 sm:text-4xl tracking-tight">Loved by 10,000+ Health Enthusiasts</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 animate-pulse">
+            {[0, 1, 2].map((item) => (
+              <div className="h-64 rounded-3xl border border-gray-100 bg-white p-8" key={item}>
+                <div className="mb-4 h-6 w-24 rounded bg-gray-200" />
+                <div className="mb-2 h-4 w-full rounded bg-gray-200" />
+                <div className="mb-8 h-4 w-4/5 rounded bg-gray-200" />
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-gray-200" />
+                  <div className="h-4 w-28 rounded bg-gray-200" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     )
   }
 
@@ -63,17 +79,13 @@ export default function TestimonialsSection() {
               
               <div className="flex items-center gap-3">
                 <img
-                  src={item.userAvatar || FALLBACK_AVATAR_URL}
-                  alt={item.userName || 'Verified Customer'}
+                  src={item.userAvatar}
+                  alt={item.userName}
                   className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = FALLBACK_AVATAR_URL;
-                  }}
                 />
                 <div>
                   <h4 className="text-sm font-bold text-gray-900 leading-none">
-                    {item.userName || 'Verified Customer'}
+                    {item.userName}
                   </h4>
                 </div>
               </div>

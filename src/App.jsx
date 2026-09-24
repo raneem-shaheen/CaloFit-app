@@ -2,9 +2,10 @@ import './App.css'
 import { Navbar } from './layouts/Navbar'
 import { ThemeProvider } from './themes/ThemeProvider'
 import HeroSection from './features/example/home/components/heroSection'
-import TestimonialsSection from './features/example/home/components/TestimonialsSection'
 import PureSection from './features/example/home/PureSection'
+import TestimonialsSection from './features/example/home/components/TestimonialsSection'
 import Footer from './features/example/home/components/Footer'
+
 function App() {
   return (
     <ThemeProvider>
@@ -12,7 +13,7 @@ function App() {
         <Navbar />
         <HeroSection />
         <PureSection />
-        <TestimonialsSection/>
+        <TestimonialsSection />
         <Footer />
       </main>
     </ThemeProvider>

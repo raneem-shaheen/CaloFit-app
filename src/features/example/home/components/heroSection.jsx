@@ -1,14 +1,9 @@
 import heroDishImg from '../../../../assets/images/hero-dish.png'
 import { useHomeData } from '../../../../services/hooks/useHomeData'
 
-const FALLBACK_AVATAR_URL = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
-
 function HeroSection() {
   const { heroData, loading } = useHomeData()
-  const rating = Math.max(
-    0,
-    Math.min(5, Math.round(Number(heroData?.rating ?? 5) || 5)),
-  )
+  const rating = Math.max(0, Math.min(5, Math.round(Number(heroData?.rating) || 0)))
 
   return (
     <section className="w-full bg-[radial-gradient(circle_at_8%_35%,#dcfce7_0%,#faf9f6_34%,#faf9f6_70%,#fef3c7_100%)] py-12 sm:py-16 lg:min-h-[calc(100vh-5rem)] lg:py-20">
@@ -39,25 +34,20 @@ function HeroSection() {
             </button>
           </div>
           <div className="flex min-h-10 flex-wrap items-center gap-6 pt-2">
-            <div className="flex items-center gap-3">
+            {loading ? (
+              <div className="flex items-center gap-3 animate-pulse">
+                <div className="h-10 w-32 rounded-full bg-gray-200" />
+                <div className="h-10 w-40 rounded bg-gray-200" />
+              </div>
+            ) : heroData ? (
+              <div className="flex items-center gap-3">
               <div className="flex min-w-[7.5rem] -space-x-2.5 overflow-hidden">
-                {loading
-                  ? [0, 1, 2].map((item) => (
-                      <span
-                        className="inline-block h-10 w-10 animate-pulse rounded-full bg-warm-200 ring-2 ring-warm-50"
-                        key={`avatar-loading-${item}`}
-                      />
-                    ))
-                  : heroData?.avatars?.map((item) => (
+                {heroData?.avatars?.map((item) => (
                       <img
                         key={item.id}
-                        src={item.avatar || FALLBACK_AVATAR_URL}
+                        src={item.avatar}
                         alt={item.name}
                         className="inline-block h-10 w-10 rounded-full object-cover ring-2 ring-warm-50"
-                        onError={(event) => {
-                          event.currentTarget.onerror = null
-                          event.currentTarget.src = FALLBACK_AVATAR_URL
-                        }}
                       />
                     ))}
               </div>
@@ -85,7 +75,8 @@ function HeroSection() {
                   </span>
                 </p>
               </div>
-            </div>
+              </div>
+            ) : null}
             <div className="hidden h-8 w-px bg-warm-200 sm:block" />
             <div className="flex min-w-[9rem] flex-col">
               <span className="text-sm font-extrabold leading-tight text-warm-900">30 min</span>

@@ -4,6 +4,7 @@ import { formatHeroFeedback,
   formatTestimonials, 
   formatPureFeatures,
   formatSocialLink,
+  formatSignatureDishes,
 } from '../dtos/home.dto';
 
 export function useHomeData() {
@@ -12,6 +13,7 @@ export function useHomeData() {
   const [loading, setLoading] = useState(true);
   const [pureFeatures,setPureFeatures]=useState([])
   const[socialLink,setSocialLink]=useState([])
+  const [dishes , setDishes]=useState([])
   useEffect(() => {
     async function loadData() {
       try {
@@ -37,6 +39,9 @@ export function useHomeData() {
         const contactData = rawData?.data || rawData || []
         setSocialLink(formatSocialLink(contactData));
 
+        const rawDishes = rawData?.data?.dishes || rawData?.dishes || [];
+        
+        setDishes(formatSignatureDishes(rawDishes))
       } catch (err) {
         console.error("error in useHomeData", err);
       } finally {
@@ -47,5 +52,5 @@ export function useHomeData() {
     loadData();
   }, []);
 
-  return { heroData, testimonials, pureFeatures,socialLink,loading };
+  return { heroData, testimonials, pureFeatures,socialLink,dishes,loading };
 }

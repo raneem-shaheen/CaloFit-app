@@ -2,6 +2,7 @@ export async function fetchHomeData() {
   const response = await fetch("https://verbose-cornhusk-aptitude.ngrok-free.dev/home", {
     headers: {
       "ngrok-skip-browser-warning": "true",
+      "Content-Type": "application/json",
     },
   });
 
