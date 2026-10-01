@@ -53,8 +53,9 @@ function writeHomeCache(data) {
 
 function getHomeDataRequest() {
   if (!homeRequestPromise) {
-    homeRequestPromise = fetchHomeData().finally(() => {
+    homeRequestPromise = fetchHomeData().then((data) => {
       homeRequestPromise = null
+      return data
     })
   }
 
@@ -63,8 +64,9 @@ function getHomeDataRequest() {
 
 function getContactRequest() {
   if (!contactRequestPromise) {
-    contactRequestPromise = fetchContactUs().finally(() => {
+    contactRequestPromise = fetchContactUs().then((data) => {
       contactRequestPromise = null
+      return data
     })
   }
 

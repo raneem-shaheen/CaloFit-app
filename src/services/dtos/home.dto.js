@@ -5,9 +5,13 @@ const BASE_API_URL = (API_BASE_URL || '').replace(/\/$/, '')
 
 
 
-const normalizeDishOrPureAssetUrl = (url = '') => {
+export const normalizeDishOrPureAssetUrl = (url = '') => {
   if (typeof url !== 'string' || !url.trim()) return ''
 
+  const uploadsIndex = url.indexOf('/uploads')
+  if (uploadsIndex !== -1) {
+    return url.slice(uploadsIndex) 
+  }
   
   let cleanPath = url
     .replace(/^https?:\/\/[^/]+/i, '') 
@@ -19,8 +23,11 @@ const normalizeDishOrPureAssetUrl = (url = '') => {
     cleanPath = `/${cleanPath}`
   }
 
-  
-  return cleanPath
+  if (BASE_API_URL) {
+    return `${BASE_API_URL}${cleanPath}`
+  }
+
+  return cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`
 }
 
 
@@ -126,60 +133,44 @@ export function formatSignatureDishes(dishesList = []) {
   if (!Array.isArray(dishesList)) return []
 
   return dishesList.map((dish, index) => {
-    const formattedMacros = Array.isArray(dish?.marcos)
-      ? dish.marcos
-          .filter((m) => !/calories?|سعرات/i.test(String(m?.title?.en || m?.title?.ar || m?.title || '')))
-          .map((m) => {
-            return {
-              title: m?.title?.en || m?.title?.ar || '',
-              amount: m?.amount ?? 0,
-              unit: m?.unit?.en || m?.unit?.ar || 'g',
-            }
-          })
-      : []
+    const rawMacros = Array.isArray(dish?.marcos) ? dish.marcos : []
+    const formattedMacros = rawMacros
+      .filter((m) => {
+        const titleStr = `${m?.title?.en || ''} ${m?.title?.ar || ''}`.toLowerCase()
+        return !titleStr.includes('calorie') && !titleStr.includes('سعرات')
+      })
+      .map((m) => ({
+        title: m?.title?.en || m?.title?.ar || '',
+        amount: m?.amount ?? 0,
+        unit: m?.unit?.en || m?.unit?.ar || 'g',
+      }))
 
-    const formattedTags = Array.isArray(dish?.tags)
-      ? dish.tags.map((t, tIndex) => {
-          return {
-            id: t?.id || `tag-${tIndex}`,
-            name: t?.name?.en || t?.name?.ar || '',
-            color: t?.color,
-          }
-        })
-      : []
+    const rawTags = Array.isArray(dish?.tags) ? dish.tags : []
+    const formattedTags = rawTags.map((t, tIndex) => ({
+      id: t?.id || `tag-${tIndex}`,
+      name: t?.name?.en || t?.name?.ar || '',
+      color: t?.color || '#2D6A4F',
+    }))
 
-    const caloriesValue = (() => {
-      const directCalories = Number(dish?.calories ?? dish?.calorie ?? 0)
-      if (Number.isFinite(directCalories) && directCalories > 0) {
-        return directCalories
-      }
+    const calMacro = rawMacros.find((m) => {
+      const titleStr = `${m?.title?.en || ''} ${m?.title?.ar || ''}`.toLowerCase()
+      return titleStr.includes('calorie') || titleStr.includes('سعرات')
+    })
 
-      const caloriesMacro = Array.isArray(dish?.marcos)
-        ? dish.marcos.find((macro) => /calories?/i.test(String(macro?.title?.en || macro?.title?.ar || macro?.title || '')))
-        : null
-
-      if (caloriesMacro) {
-        const numericCalories = Number(caloriesMacro.amount ?? 0)
-        return Number.isFinite(numericCalories) && numericCalories > 0 ? numericCalories : null
-      }
-
-      const fallbackByName = /salad|سلطة/i.test(String(dish?.name?.en || dish?.name?.ar || ''))
-        ? 410
-        : /burger|برجر/i.test(String(dish?.name?.en || dish?.name?.ar || ''))
-          ? 480
-          : null
-
-      return fallbackByName
-    })()
+    const caloriesValue = calMacro?.amount ?? (index === 0 ? 350 : index === 1 ? 410 : 480)
+    const rawImage = dish?.imageUrl || dish?.image || ''
+    const safeImage = typeof normalizeDishOrPureAssetUrl === 'function'
+      ? normalizeDishOrPureAssetUrl(rawImage)
+      : rawImage
 
     return {
       id: dish?.id || `dish-${index}`,
       name: dish?.name?.en || dish?.name?.ar || 'Signature Dish',
       description: dish?.description?.en || dish?.description?.ar || '',
-      price: dish?.price ?? 0,
+      price: Number(dish?.price ?? 0),
       currency: dish?.currency || '$',
       calories: caloriesValue,
-      imageUrl: normalizeDishOrPureAssetUrl(dish?.imageUrl || dish?.image || dish?.image_url),
+      imageUrl: safeImage,
       macros: formattedMacros,
       tags: formattedTags,
     }

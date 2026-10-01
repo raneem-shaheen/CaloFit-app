@@ -1,9 +1,13 @@
 import React from 'react'
 import DishesSkeleton from './DishesSkeleton'
+import { useHomeData } from '../../../../services/hooks/useHomeData' 
 
-export default function TopSellingSection({ dishes = [], loading = false }) {
+export default function TopSellingSection({ dishes: propDishes, loading: propLoading }) {
+  const { dishes: hookDishes, loading: hookLoading } = useHomeData()
+  
+  const dishes = propDishes || hookDishes || []
+  const loading = propLoading !== undefined ? propLoading : hookLoading
   const safeDishes = Array.isArray(dishes) ? dishes : []
-
   const getTagTextColor = (color) => {
     const value = typeof color === 'string' ? color.trim().toLowerCase() : ''
 
